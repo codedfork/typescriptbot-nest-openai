@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Socket Messenger</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     :root {
       --primary-color: #6c5ce7;
@@ -192,12 +194,18 @@
     .typing-indicator {
       font-size: 0.8rem;
       color: #666;
-      margin-left: 0.5rem;
+      padding: 0.5rem 1rem;
       font-style: italic;
-      height: 1rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: var(--border-radius);
+      margin: 0.5rem auto;
+      width: fit-content;
     }
 
-    /* Scrollbar styling */
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -216,7 +224,6 @@
       background: #a8a8a8;
     }
 
-    /* Responsive design */
     @media (max-width: 768px) {
       .message {
         max-width: 85%;
@@ -249,10 +256,17 @@
       <span>Connecting...</span>
     </div>
   </header>
+
   <div id="chat-container"></div>
+
+  <div id="typing-indicator" class="typing-indicator">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Please wait...</span>
+  </div>
+
   <form id="message-form">
     <div class="input-container">
-      <input type="text" id="message-input" placeholder="Type your message..." required />
+      <textarea id="message-input" placeholder="Type your message..." required></textarea>
     </div>
     <button type="submit" id="send-button">
       <i class="fas fa-paper-plane"></i>
@@ -260,7 +274,6 @@
     </button>
   </form>
 
-  <!-- Load Socket.IO -->
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
   <script>
     const socket = io('http://localhost:3000');
@@ -268,14 +281,12 @@
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
     const connectionStatus = document.getElementById('connection-status');
+    const typingIndicator = document.getElementById('typing-indicator');
 
-    // Connection status
     socket.on('connect', () => {
       connectionStatus.innerHTML = '<i class="fas fa-circle"></i> <span>Connected</span>';
       connectionStatus.classList.add('connected');
       connectionStatus.classList.remove('disconnected');
-
-      // Add welcome message
       addMessage('System', 'You are now connected to the chat!', 'received');
     });
 
@@ -285,12 +296,25 @@
       connectionStatus.classList.remove('connected');
     });
 
-    // Receive messages
-    socket.on('message', (data) => {
-      addMessage('Ai Assistant', data, 'received');
+    socket.on('connect_error', () => {
+      connectionStatus.innerHTML = '<i class="fas fa-circle"></i> <span>Connection Failed</span>';
+      connectionStatus.classList.add('disconnected');
     });
 
-    // Send message
+    socket.on('message', (data) => {
+      console.log(typingIndicator.style.display);
+      addMessage('Ai Assistant', data, 'received');
+      typingIndicator.style.display = 'none';
+    });
+
+    socket.on('typing', () => {
+      typingIndicator.style.display = 'flex';
+    });
+
+    socket.on('stopTyping', () => {
+      typingIndicator.style.display = 'none';
+    });
+
     messageForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const messageText = messageInput.value.trim();
@@ -298,33 +322,43 @@
         addMessage('You', messageText, 'sent');
         socket.emit('message', messageText);
         messageInput.value = '';
+        messageInput.style.height = 'auto';
+        typingIndicator.style.display = 'flex';
       }
     });
 
-    // Add a new message to the chat
+    let typing = false;
+    let timeout;
+
+    messageInput.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+
+      if (!typing) {
+        typing = true;
+        socket.emit('typing');
+      }
+
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        typing = false;
+        socket.emit('stopTyping');
+      }, 1000);
+    });
+
     function addMessage(sender, text, type) {
       const messageElement = document.createElement('div');
       messageElement.classList.add('message', type);
-
       const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
       messageElement.innerHTML = `
         <strong>${sender}</strong>
         <p>${text}</p>
         <span class="message-time">${time}</span>
       `;
-
       chatContainer.appendChild(messageElement);
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Auto-resize textarea
-    messageInput.addEventListener('input', function () {
-      this.style.height = 'auto';
-      this.style.height = (this.scrollHeight) + 'px';
-    });
-
-    // Focus input on load
     window.addEventListener('load', () => {
       messageInput.focus();
     });

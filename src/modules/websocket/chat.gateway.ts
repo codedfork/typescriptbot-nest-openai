@@ -49,8 +49,6 @@ export class ChatGateway
   ): Promise<void> {
     try {
       this.logger.log(`✅ Message from client: ${message} ${client.id}`);
-
-      this.server.emit('message', `Please wait....`);
       this.chatQueueService.addMessageJob(message, client.id);
     } catch (error) {
       this.logger.error(error);
