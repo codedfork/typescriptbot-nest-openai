@@ -4,10 +4,11 @@ import { AppService } from './app.service';
 import { OpenaiModule } from './modules/openai/openai.module';
 import { ChatGateway } from './modules/websocket/chat.gateway';
 import { OpenaiService } from './modules/openai/openai.service';
+import { BullMqModule } from './modules/bull-mq/bull-mq.module';
 
 @Module({
-  imports: [OpenaiModule],
+  imports: [OpenaiModule, BullMqModule],
   controllers: [AppController],
-  providers: [AppService, ChatGateway, OpenaiService],
+  providers: [AppService, OpenaiService],
 })
 export class AppModule { }

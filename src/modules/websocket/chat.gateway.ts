@@ -9,8 +9,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { OpenaiService } from '../openai/openai.service';
-import { IOpenaiTextContent } from '../openai/openai.interface';
+import { ChatQueueService } from '../bull-mq/chat-queue.service';
 
 @WebSocketGateway({
   cors: {
@@ -22,14 +21,16 @@ export class ChatGateway
   implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly logger = new Logger(ChatGateway.name);
-  private readonly messageQueue = [];
-  constructor(private readonly openaiService: OpenaiService) {
+  constructor(private readonly chatQueueService: ChatQueueService) {
 
   }
 
   @WebSocketServer()
   server: Server;
 
+  afterInit(server: Server) {
+    this.server = server;
+  }
   handleConnection(client: Socket) {
     console.log(`✅ Client connected: ${client.id}`);
     this.logger.log(`✅ Client connected: ${client.id}`);
@@ -48,12 +49,9 @@ export class ChatGateway
   ): Promise<void> {
     try {
       this.logger.log(`✅ Message from client: ${message} ${client.id}`);
-      //Generating gpt response
-      const payload: IOpenaiTextContent = { textContent: message };
-      
 
-      const gptResponse = await this.openaiService.processGpt(payload);
-      this.server.emit('message', `${gptResponse}`);
+      this.server.emit('message', `Please wait....`);
+      this.chatQueueService.addMessageJob(message, client.id);
     } catch (error) {
       this.logger.error(error);
     }
