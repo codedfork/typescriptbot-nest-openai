@@ -5,6 +5,9 @@ import { ChatMessageProcessor } from './chat-messages.processor';
 import { OpenaiService } from '../openai/openai.service';
 import { Server } from 'socket.io';
 import { ChatGateway } from '../websocket/chat.gateway';
+import { RedisMonitorService } from './redis-monitor.service';
+import { RedisInspectService } from './redis-inspect-service';
+import { RedisController } from './redis.controller';
 
 @Module({
     imports: [
@@ -20,7 +23,8 @@ import { ChatGateway } from '../websocket/chat.gateway';
             name: 'chat-messages',
         }),
     ],
-    providers: [ChatQueueService, ChatMessageProcessor, OpenaiService, Server, ChatGateway],
+    providers: [ChatQueueService, ChatMessageProcessor, OpenaiService, Server, ChatGateway, RedisMonitorService,RedisInspectService],
     exports: [BullModule, ChatQueueService],
+    controllers:[RedisController]
 })
 export class BullMqModule { }
