@@ -17,7 +17,8 @@ export class ChatMessageProcessor extends WorkerHost {
 
     async process(job: Job<any>) {
         const { message, clientId } = job.data;
-        this.logger.log(`Processing job: ${message} ${clientId}`);
+        this.logger.log(`Processing job: ${JSON.stringify(message)} ${JSON.stringify(clientId)}`);
+
 
         // Here you can call OpenAI or handle DB/cache logic
         //Generating gpt response
@@ -26,7 +27,7 @@ export class ChatMessageProcessor extends WorkerHost {
         const gptResponse = await this.openaiService.processGpt(payload);
         this.chatGateway.server.to(clientId).emit('message', `${gptResponse}`);
 
-        this.logger.log(`Processed job: ${message}`);
+        this.logger.log(`Processed job: ${gptResponse}`);
 
     }
 }

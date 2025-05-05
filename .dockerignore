@@ -6,6 +6,7 @@ dist
 
 # Ignore environment files
 .env
+.aws
 .env.local
 .env.*.local
 
