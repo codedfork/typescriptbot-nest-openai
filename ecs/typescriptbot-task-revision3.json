@@ -1,0 +1,101 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:eu-north-1:564992081081:task-definition/typescriptbot-task:3",
+    "containerDefinitions": [
+        {
+            "name": "typescriptbot",
+            "image": "564992081081.dkr.ecr.eu-north-1.amazonaws.com/typescriptbot:latest",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "name": "typescriptbot-3000-tcp",
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "AZURE_OPENAI_DEPLOYMENT",
+                    "value": "gpt-4o-mini"
+                },
+                {
+                    "name": "REDIS_HOST",
+                    "value": "typescriptbot-redis-intance.redis.cache.windows.net"
+                },
+                {
+                    "name": "REDIS_PORT",
+                    "value": "6380"
+                },
+                {
+                    "name": "AZURE_OPENAI_API_KEY",
+                    "value": "CWMx8xoEr4BOB3suU2esykr2Ritj8sF33g7jBEwnOEDc0JQ7Ae39JQQJ99BDACHYHv6XJ3w3AAAAACOG0GsY"
+                },
+                {
+                    "name": "REDIS_PASSWORD",
+                    "value": "m7WklO7B6kYANhcyttVT6tiG4EtDxwPpBAzCaHkXjPw="
+                },
+                {
+                    "name": "AZURE_OPENAI_API_VERSION",
+                    "value": "2024-04-01-preview"
+                },
+                {
+                    "name": "AZURE_OPENAI_MODEL_NAME",
+                    "value": "gpt-4o-mini"
+                },
+                {
+                    "name": "AZURE_OPENAI_ENDPOINT",
+                    "value": "https://ksour-ma0zuwap-eastus2.cognitiveservices.azure.com/"
+                }
+            ],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "ulimits": [],
+            "systemControls": []
+        }
+    ],
+    "family": "typescriptbot-task",
+    "taskRoleArn": "arn:aws:iam::564992081081:role/ecsTaskExecutionRole",
+    "executionRoleArn": "arn:aws:iam::564992081081:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "revision": 3,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "3072",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "registeredAt": "2025-05-06T13:09:39.467Z",
+    "registeredBy": "arn:aws:iam::564992081081:root",
+    "enableFaultInjection": false,
+    "tags": []
+}

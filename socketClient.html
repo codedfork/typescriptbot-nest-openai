@@ -276,7 +276,7 @@
 
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
   <script>
-    const socket = io('http://localhost:3000');
+    const socket = io('http://13.50.234.107:3000');
     const chatContainer = document.getElementById('chat-container');
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
@@ -302,8 +302,7 @@
     });
 
     socket.on('message', (data) => {
-      console.log(typingIndicator.style.display);
-      addMessage('Ai Assistant', data, 'received');
+      addMessage('Ai Bot', data, 'received');
       typingIndicator.style.display = 'none';
     });
 
@@ -344,6 +343,14 @@
         typing = false;
         socket.emit('stopTyping');
       }, 1000);
+    });
+
+    // ✅ NEW: Press Enter to submit, Shift+Enter for newline
+    messageInput.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault(); // Prevent newline
+        messageForm.dispatchEvent(new Event('submit')); // Trigger form submission
+      }
     });
 
     function addMessage(sender, text, type) {
