@@ -24,7 +24,7 @@ export class ChatMessageProcessor extends WorkerHost {
         //Generating gpt response
         const payload: IOpenaiTextContent = { textContent: message };
 
-        const gptResponse = await this.openaiService.processGpt(payload);
+        const gptResponse = await this.openaiService.processGptChat(payload);
         this.chatGateway.server.to(clientId).emit('message', `${gptResponse}`);
 
         this.logger.log(`Processed job: ${gptResponse}`);

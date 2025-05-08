@@ -1,3 +1,4 @@
 export interface IOpenaiTextContent {
-    textContent: string;
+    textContent?: string;
+    topic?: string;
 }
